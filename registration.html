@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .form-item {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4d90fe;
+        }
+
+        small {
+            color: #ff4444;
+            display: block;
+            margin-top: 0.25rem;
+            visibility: hidden;
+        }
+
+        .error small {
+            visibility: visible;
+        }
+
+        .error input {
+            border-color: #ff4444;
+        }
+
+        .success input {
+            border-color: #00C851;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #4d90fe;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #357ae8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Register</h1>
+        <form id="registration-form">
+            <div class="form-item">
+                <label for="username">Username</label>
+                <input type="text" id="username">
+                <small>Error message</small>
+            </div>
+
+            <div class="form-item">
+                <label for="email">Email</label>
+                <input type="email" id="email">
+                <small>Error message</small>
+            </div>
+
+            <div class="form-item">
+                <label for="password">Password</label>
+                <input type="password" id="password">
+                <small>Error message</small>
+            </div>
+
+            <div class="form-item">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword">
+                <small>Error message</small>
+            </div>
+
+            <button type="submit">Register</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById("registration-form");
+        const username = document.getElementById("username");
+        const email = document.getElementById("email");
+        const password = document.getElementById("password");
+        const confirmPassword = document.getElementById("confirmPassword");
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const isRequiredValid = checkRequired([username, email, password, confirmPassword]);
+            let isFormValid = isRequiredValid;
+            
+            if (isRequiredValid) {
+                const isUsernameValid = checkLength(username, 3, 15);
+                const isEmailValid = checkEmail(email);
+                const isPasswordValid = checkLength(password, 6, 15);
+                const isPasswordsMatch = checkPasswordsMatch(password, confirmPassword);
+
+                isFormValid = isUsernameValid && isEmailValid && isPasswordValid && isPasswordsMatch;
+            }
+
+            if (isFormValid) {
+                alert("Registration successful!");
+                form.reset();
+                document.querySelectorAll(".form-item").forEach((group) => {
+                    group.className = "form-item";
+                }); 
+            }
+        });
+
+        function checkRequired(inputArray) {
+            let isValid = true;
+
+            inputArray.forEach((input) => {
+                if (input.value.trim() === "") {
+                    showError(input, `${formatFieldName(input)} is required`);
+                    isValid = false;
+                } else {
+                    showSuccess(input);
+                }
+            });
+            return isValid;
+        }
+
+        function checkLength(input, min, max) {
+            if (input.value.length < min) {
+                showError(input, `${formatFieldName(input)} must be at least ${min} characters.`);
+                return false;
+            } else if (input.value.length > max) {
+                showError(input, `${formatFieldName(input)} must be less than ${max} characters.`);
+                return false;
+            } else {
+                showSuccess(input);
+                return true;
+            }
+        }
+
+        function formatFieldName(input) {
+            return input.id.charAt(0).toUpperCase() + input.id.slice(1);
+        }
+
+        function checkEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (emailRegex.test(email.value.trim())) {
+                showSuccess(email);
+                return true;
+            } else {
+                showError(email, "Email is not valid");
+                return false;
+            }
+        }
+
+        function checkPasswordsMatch(input1, input2) {
+            if (input1.value !== input2.value) {
+                showError(input2, "Passwords do not match");
+                return false;
+            }
+            showSuccess(input2);
+            return true;
+        }
+
+        function showError(input, message) {
+            const formGroup = input.parentElement;
+            formGroup.className = "form-item error";
+            const small = formGroup.querySelector("small");
+            small.innerText = message;
+        }
+
+        function showSuccess(input) {
+            const formGroup = input.parentElement;
+            formGroup.className = "form-item success";
+        }
+    </script>
+</body>
+</html>
